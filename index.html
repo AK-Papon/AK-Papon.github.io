@@ -129,6 +129,79 @@
         </footer>
     </div>
 
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas to full screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Matrix characters (Katakana + Latin + numbers)
+        const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ";
+        const charArr = chars.split('');
+
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        // Initialize drop positions for every column
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        // Drawing the digital rain effect
+        function draw() {
+            // Semi-transparent black to create a trailing fade effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Neon green text
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                // Pick a random character
+                const text = charArr[Math.floor(Math.random() * charArr.length)];
+                
+                // Draw the character
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                // Send the drop back to the top randomly after it hits the bottom
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                
+                // Move the drop down
+                drops[i]++;
+            }
+        }
+
+        let animationFrame = setInterval(draw, 35);
+
+        // Interactivity: Speed up the matrix rain when you type!
+        let speed = 35;
+        window.addEventListener('keydown', () => {
+            clearInterval(animationFrame);
+            speed = 10; // Typing makes the code fall faster
+            animationFrame = setInterval(draw, speed);
+            
+            // Reset to normal speed after a second of not typing
+            clearTimeout(window.typingTimeout);
+            window.typingTimeout = setTimeout(() => {
+                clearInterval(animationFrame);
+                speed = 35;
+                animationFrame = setInterval(draw, speed);
+            }, 1000);
+        });
+
+        // Resize the canvas if the window size changes
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
 </body>
 </html>
 
